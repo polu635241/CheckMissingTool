@@ -17,6 +17,9 @@ namespace CheckMissingTool.Tool
 				return EditorStyles.miniButton;
 			}
 		}
+
+		protected const float buttoHeight = 50f;
+
 		protected GUIStyle fieldNameGUIStyle
 		{
 			get
