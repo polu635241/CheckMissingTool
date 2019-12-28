@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 namespace CheckMissingTool.Model
 {
@@ -21,6 +23,7 @@ namespace CheckMissingTool.Model
 
 		public ComponentDescription(Component ownerComponent)
 		{
+			#if UNITY_EDITOR
 			//GetComponents 抓的到 可是回傳null 表示整個腳本掉了
 			if (ownerComponent == null)
 			{
@@ -58,6 +61,7 @@ namespace CheckMissingTool.Model
 					}
 				}
 			}
+			#endif
 		}
 
 		/// <summary>

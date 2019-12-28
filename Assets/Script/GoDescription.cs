@@ -15,17 +15,11 @@ namespace CheckMissingTool.Model
 		[SerializeField]
 		string path;
 
-		[SerializeField]
 		GameObject entity;
 
-		public GameObject Entity
-		{
-			get
-			{
-				return entity;
-			}
-		}
-		
+		[SerializeField]
+		List<ComponentDescription> componentDescriptions = new List<ComponentDescription> ();
+
 		public static List<GoDescription> RecursiveCollection (GameObject entity)
 		{
 			List<GoDescription> collections = new List<GoDescription> ();
@@ -55,7 +49,7 @@ namespace CheckMissingTool.Model
 		{
 			List<GoDescription> childDescriptions = new List<GoDescription> ();
 			
-			foreach (Transform child in this.Entity.transform) 
+			foreach (Transform child in this.entity.transform) 
 			{
 				GoDescription childDescription = new GoDescription (child.gameObject, this);
 
@@ -66,7 +60,10 @@ namespace CheckMissingTool.Model
 			return childDescriptions;
 		}
 
-		public void Flush()
+		/// <summary>
+		/// 底下的component有問題的時候才會去遞迴查找出完整的子物件Path
+		/// </summary>
+		public void ProcessRecursivePath()
 		{
 			List<GameObject> parentsGos = new List<GameObject> ();
 
@@ -77,7 +74,7 @@ namespace CheckMissingTool.Model
 			{
 				if (focusDescription != null) 
 				{
-					parentsGos.Add (focusDescription.Entity);
+					parentsGos.Add (focusDescription.entity);
 
 					focusDescription = focusDescription.parent;
 				}
@@ -96,9 +93,23 @@ namespace CheckMissingTool.Model
 				{
 					pathStringBuilder.Append($"{parentsGo.name}/");
 				});
-			pathStringBuilder.Append (this.Entity.name);
+			pathStringBuilder.Append (this.entity.name);
 
 			path = pathStringBuilder.ToString ();
+		}
+
+		public void ProcessComponent()
+		{
+			Component[] subComponents= this.entity.GetComponents<Component>();
+
+			componentDescriptions = new List<ComponentDescription> ();
+
+			Array.ForEach<Component>(subComponents,(subComponent)=>
+				{
+					ComponentDescription componentDescription = new ComponentDescription(subComponent);
+
+					componentDescriptions.Add(componentDescription);
+				});
 		}
 	}
 }
