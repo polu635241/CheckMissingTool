@@ -15,11 +15,35 @@ namespace CheckMissingTool.Model
 		[SerializeField]
 		ComponentStatus status;
 
+		public ComponentStatus Status
+		{
+			get
+			{
+				return status;
+			}
+		}
+
 		[SerializeField]
 		List<string> missingFieldPaths = new List<string>();
 
+		public List<string> MissingFieldPaths
+		{
+			get
+			{
+				return missingFieldPaths;
+			}
+		}
+
 		[SerializeField]
 		string componentName;
+
+		public string ComponentName
+		{
+			get
+			{
+				return componentName;
+			}
+		}
 
 		public ComponentDescription(Component ownerComponent)
 		{

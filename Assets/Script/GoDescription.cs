@@ -15,10 +15,26 @@ namespace CheckMissingTool.Model
 		[SerializeField]
 		string path;
 
+		public string Path
+		{
+			get
+			{
+				return path;
+			}
+		}
+
 		GameObject entity;
 
 		[SerializeField]
 		List<ComponentDescription> componentDescriptions = new List<ComponentDescription> ();
+
+		public List<ComponentDescription> ComponentDescriptions
+		{
+			get
+			{
+				return componentDescriptions;
+			}
+		}
 
 		public static List<GoDescription> RecursiveCollection (GameObject entity)
 		{
