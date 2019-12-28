@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace CheckMissingTool.Tool
 {
-	public abstract class SerializedObjectEditor<T> : Editor where T:MonoBehaviour 
+	public abstract class SerializedObjectEditor<T> : Editor where T:UnityEngine.Object 
 	{
 		protected T runtimeScript;
 
