@@ -71,7 +71,7 @@ namespace CheckMissingTool
 
 				goDescription.ProcessRecursivePath();
 
-				Debug.LogError(MixStringColor(goDescription.Path, setting.pathColor));
+				Debug.Log(MixStringColor(goDescription.Path, setting.pathColor));
 
 				missingGoDescriptions.Add(goDescription);
 
@@ -84,20 +84,20 @@ namespace CheckMissingTool
 						}
 						else
 						{
-							Debug.LogError(MixStringColor(comDesc.ComponentName, setting.componentColor));
+							Debug.Log(MixStringColor(comDesc.ComponentName, setting.componentColor));
 
 							if(comDesc.Status == ComponentStatus.ScriptMissing)
 							{
-								Debug.LogError(MixStringColor("ScriptMissing", setting.missingScriptColor));
+								Debug.Log(MixStringColor("ScriptMissing", setting.missingScriptColor));
 							}
 
 							if(comDesc.Status == ComponentStatus.FieldMissing)
 							{
-								Debug.LogError(MixStringColor("FieldMissing ->", setting.fieldColor));
+								Debug.Log(MixStringColor("FieldMissing ->", setting.fieldColor));
 
 								comDesc.MissingFieldPaths.ForEach(fieldPath=>
 									{
-										Debug.LogError(MixStringColor(fieldPath, setting.fieldColor));
+										Debug.Log(MixStringColor(fieldPath, setting.fieldColor));
 									});
 							}
 						}
