@@ -18,6 +18,8 @@ MonoBehaviour:
     missingScriptColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
     missingFieldColor: {r: 1, g: 0, b: 0, a: 1}
     defultMsgColor: {r: 1, g: 0.47586206, b: 0, a: 1}
+    searchPaths:
+    - Assets/Demo
   sceneCheckMissingResult:
     scenePath: Assets/Demo/Scene/DemoScene.unity
     missingGoDescriptions:
@@ -31,3 +33,7 @@ MonoBehaviour:
         - material
         - materialTable.material
         componentName: CheckMissingTool.Demo.BlackBoard
+  projectCheckMissingResult:
+    searchPaths:
+    - Assets/Script
+    missingGoDescriptions: []
