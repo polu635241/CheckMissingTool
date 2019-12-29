@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,7 +11,7 @@ namespace CheckMissingTool.Tool
 	static class ExportTool
 	{
 		[MenuItem("CheckMissingTool/Export Package")]
-		static void Export_Package()
+		public static void Export_Package()
 		{
 //			string[] guids = AssetDatabase.FindAssets ("",new string[]{"Assets/Script"});
 
@@ -19,10 +20,15 @@ namespace CheckMissingTool.Tool
 //					string path = AssetDatabase.GUIDToAssetPath(guid);
 //					Debug.Log(path);
 //				});
-											//資料夾底下所有檔案都要        //輸出完會彈出視窗
-			ExportPackageOptions options = ExportPackageOptions.Recurse | ExportPackageOptions.Interactive;
+											//資料夾底下所有檔案都要
+			ExportPackageOptions options = ExportPackageOptions.Recurse;
 
-			AssetDatabase.ExportPackage ("Assets/Script", "Output/AAA.unitypackage", options);
+			string outputPath = Application.dataPath + "/../Output/CheckMissingTool.unitypackage";
+
+			AssetDatabase.ExportPackage ("Assets/Script", outputPath, options);
+
+			Debug.Log ("-->");
+			Debug.Log (outputPath);
 		}
 		
 	}
