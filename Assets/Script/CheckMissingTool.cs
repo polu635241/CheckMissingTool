@@ -22,6 +22,9 @@ namespace CheckMissingTool
 		[SerializeField]
 		SceneCheckMissingResult sceneCheckMissingResult;
 
+		[SerializeField]
+		ProjectCheckMissingResult projectCheckMissingResult;
+
 		public void CheckScene()
 		{
 			#if UNITY_EDITOR
@@ -47,9 +50,16 @@ namespace CheckMissingTool
 
 			this.sceneCheckMissingResult = new SceneCheckMissingResult(scenePath, missingGoDescriptions);
 			EditorUtility.ClearProgressBar();
+			Debug.Log (MixStringColor ("End Check Scene ~~", setting.defultMsgColor));
 			#endif
 		}
 
+		/// <summary>
+		/// 把整個場景的Gameobject 都納入一個list 並統一處理
+		/// 不以頂點物件作為進度的依據主要是因為某些場景可能只有單一個root 這樣進度條沒有參考性
+		/// </summary>
+		/// <returns>The scene G.</returns>
+		/// <param name="goDescriptions">Go descriptions.</param>
 		List<GoDescription> ProcessSceneGO(List<GoDescription> goDescriptions)
 		{
 			List<GoDescription> missingGoDescriptions = new List<GoDescription> ();
@@ -75,6 +85,63 @@ namespace CheckMissingTool
 			return missingGoDescriptions;
 		}
 
+		public void CheckProject()
+		{
+			#if UNITY_EDITOR
+			Debug.Log (MixStringColor ("Begin Check Project ~~", setting.defultMsgColor));
+
+			EditorUtility.DisplayProgressBar("Search", "正在搜尋專案中的prefab", 0f);
+
+			List<KeyValuePair<string,GameObject>> projectPrefabPairPaths = FindProjectPrefabs(setting.searchPaths);
+
+			List<GoDescription> missingGoDescriptions =  ProcessProjectGO(projectPrefabPairPaths);
+
+			this.projectCheckMissingResult = new ProjectCheckMissingResult(setting.searchPaths, missingGoDescriptions);
+
+			EditorUtility.ClearProgressBar();
+			Debug.Log (MixStringColor ("End Check Project ~~", setting.defultMsgColor));
+			#endif
+		}
+
+		/// <summary>
+		/// 把物件依據實體的prefab分類 再把底下的子物件 蒐集成list處理 而不是像場景那樣一次性把全部物件合進一個list
+		/// </summary>
+		/// <returns>The project G.</returns>
+		/// <param name="projectPrefabPairPaths">Project prefab pair paths.</param>
+		List<GoDescription> ProcessProjectGO(List<KeyValuePair<string,GameObject>> projectPrefabPairPaths )
+		{
+			List<GoDescription> missingGoDescriptions = new List<GoDescription> ();
+
+			for (int i = 0; i < projectPrefabPairPaths.Count; i++) 
+			{
+				//加一因為index從0開始
+				float progress = (i + 1) / projectPrefabPairPaths.Count;
+				EditorUtility.DisplayProgressBar ("Search", $"正在處理第{i}個物件", 0f);
+				KeyValuePair<string,GameObject> projectPrefabPairPath = projectPrefabPairPaths [i];
+
+				string filePath = projectPrefabPairPath.Key;
+				GameObject prefab = projectPrefabPairPath.Value;
+
+				List<GoDescription> goDescriptions = GoDescription.RecursiveCollection (prefab);
+
+				goDescriptions.ForEach (goDescription=>
+					{
+						goDescription.ProcessComponent();
+
+						if (CheckMissing (goDescription)) 
+						{
+							goDescription.ProcessRecursivePath();
+							goDescription.InsertPrefabPath(filePath);
+							ProcessLog (goDescription);
+
+							missingGoDescriptions.Add(goDescription);
+						}
+					});
+			}
+
+			return missingGoDescriptions;
+		}
+
 		bool CheckMissing(GoDescription goDescription)
 		{
 			//如果所有Component都通過那就跳過他
@@ -92,8 +159,6 @@ namespace CheckMissingTool
 
 		void ProcessLog(GoDescription goDescription)
 		{
-			goDescription.ProcessRecursivePath();
-
 			Debug.Log(MixStringColor(goDescription.Path, setting.pathColor));
 
 			goDescription.ComponentDescriptions.ForEach(comDesc=>
@@ -125,11 +190,6 @@ namespace CheckMissingTool
 				});
 		}
 
-		public void CheckProject()
-		{
-			Debug.Log (MixStringColor ("Begin Check Project ~~", setting.defultMsgColor));
-		}
-
 		/// <summary>
 		/// 方便使用者抽換
 		/// </summary>
@@ -139,6 +199,31 @@ namespace CheckMissingTool
 		string MixStringColor(System.Object input, Color inputColor)
 		{
 			return Tool.Tool.MixStringColor (input, inputColor);
+		}
+
+		List<KeyValuePair<string,GameObject>> FindProjectPrefabs(string[] paths)
+		{
+			List<KeyValuePair<string,GameObject>> projectPrefabPairPaths = new List<KeyValuePair<string, GameObject>> ();
+
+			string[] guids = null;
+
+			if (paths != null && paths.Length > 0)
+			{
+				guids = AssetDatabase.FindAssets("t:Prefab", paths);
+			}
+			else
+			{
+				guids = AssetDatabase.FindAssets("t:Prefab");
+			}
+
+			Array.ForEach(guids,(guid) =>
+				{
+					string path = AssetDatabase.GUIDToAssetPath(guid);
+					GameObject go = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+					projectPrefabPairPaths.Add(new KeyValuePair<string, GameObject>(path, go));
+				});
+
+			return projectPrefabPairPaths;
 		}
 	}
 
@@ -162,6 +247,9 @@ namespace CheckMissingTool
 
 		[Header("顯示一般訊息的顏色")]
 		public Color defultMsgColor = Color.grey;
+
+		[Header("指定掃描的資料夾 若無指定 就是整個專案")]
+		public string[] searchPaths;
 	}
 
 	[Serializable]
@@ -175,6 +263,22 @@ namespace CheckMissingTool
 		
 		[SerializeField]
 		string scenePath;
+
+		[SerializeField]
+		List<GoDescription> missingGoDescriptions = new List<GoDescription> ();
+	}
+
+	[Serializable]
+	class ProjectCheckMissingResult
+	{
+		public ProjectCheckMissingResult (string[] searchPaths, List<GoDescription> missingGoDescriptions)
+		{
+			this.searchPaths = new List<string> (searchPaths);
+			this.missingGoDescriptions = new List<GoDescription> (missingGoDescriptions);
+		}
+
+		[SerializeField]
+		List<string> searchPaths;
 
 		[SerializeField]
 		List<GoDescription> missingGoDescriptions = new List<GoDescription> ();

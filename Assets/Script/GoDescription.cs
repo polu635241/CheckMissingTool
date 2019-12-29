@@ -23,6 +23,15 @@ namespace CheckMissingTool.Model
 			}
 		}
 
+		/// <summary>
+		/// 若為實體prefab 外部傳入檔案位置
+		/// </summary>
+		/// <param name="filePath">File path.</param>
+		public void InsertPrefabPath(string filePath)
+		{
+			path = filePath + "~/" + path;
+		}
+
 		GameObject entity;
 
 		[SerializeField]
