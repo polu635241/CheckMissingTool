@@ -63,49 +63,66 @@ namespace CheckMissingTool
 
 				goDescription.ProcessComponent();
 
-				//如果所有Component都通過那就跳過他
-				if(goDescription.ComponentDescriptions.TrueForAll(comDesc=>comDesc.Status== ComponentStatus.Safe))
+				if (CheckMissing (goDescription)) 
 				{
-					continue;
+					goDescription.ProcessRecursivePath();
+					ProcessLog (goDescription);
+
+					missingGoDescriptions.Add(goDescription);
 				}
-
-				goDescription.ProcessRecursivePath();
-
-				Debug.Log(MixStringColor(goDescription.Path, setting.pathColor));
-
-				missingGoDescriptions.Add(goDescription);
-
-				goDescription.ComponentDescriptions.ForEach(comDesc=>
-					{
-						//跳過Safe的
-						if(comDesc.Status == ComponentStatus.Safe)
-						{
-							return;
-						}
-						else
-						{
-							Debug.Log(MixStringColor(comDesc.ComponentName, setting.componentColor));
-
-							if(comDesc.Status == ComponentStatus.ScriptMissing)
-							{
-								Debug.Log(MixStringColor("ScriptMissing", setting.missingScriptColor));
-							}
-
-							if(comDesc.Status == ComponentStatus.FieldMissing)
-							{
-								Debug.Log(MixStringColor("FieldMissing ->", setting.fieldColor));
-
-								comDesc.MissingFieldPaths.ForEach(fieldPath=>
-									{
-										Debug.Log(MixStringColor(fieldPath, setting.fieldColor));
-									});
-							}
-						}
-					});
-
 			}
 
 			return missingGoDescriptions;
+		}
+
+		bool CheckMissing(GoDescription goDescription)
+		{
+			//如果所有Component都通過那就跳過他
+			if(goDescription.ComponentDescriptions.TrueForAll(comDesc=>comDesc.Status== ComponentStatus.Safe))
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+
+			return true;
+		}
+
+		void ProcessLog(GoDescription goDescription)
+		{
+			goDescription.ProcessRecursivePath();
+
+			Debug.Log(MixStringColor(goDescription.Path, setting.pathColor));
+
+			goDescription.ComponentDescriptions.ForEach(comDesc=>
+				{
+					//跳過Safe的
+					if(comDesc.Status == ComponentStatus.Safe)
+					{
+						return;
+					}
+					else
+					{
+						Debug.Log(MixStringColor(comDesc.ComponentName, setting.componentColor));
+
+						if(comDesc.Status == ComponentStatus.ScriptMissing)
+						{
+							Debug.Log(MixStringColor("ScriptMissing", setting.missingScriptColor));
+						}
+
+						if(comDesc.Status == ComponentStatus.FieldMissing)
+						{
+							Debug.Log(MixStringColor("FieldMissing ->", setting.fieldColor));
+
+							comDesc.MissingFieldPaths.ForEach(fieldPath=>
+								{
+									Debug.Log(MixStringColor(fieldPath, setting.fieldColor));
+								});
+						}
+					}
+				});
 		}
 
 		public void CheckProject()
