@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 983bfe7c11ee8d24c9c1c0eea72d6c26, type: 3}
+  m_Name: CheckMissingTool
+  m_EditorClassIdentifier: 
+  setting:
+    pathColor: {r: 0, g: 1, b: 0.006896496, a: 1}
+    componentColor: {r: 1, g: 0, b: 1, a: 1}
+    fieldColor: {r: 0, g: 0.847, b: 1, a: 1}
+    missingScriptColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    missingFieldColor: {r: 1, g: 0, b: 0, a: 1}
+    defultMsgColor: {r: 1, g: 0.47586206, b: 0, a: 1}
+    searchPaths:
+    - Assets/Demo
+  sceneCheckMissingResult:
+    scenePath: Assets/Demo/Scene/DemoScene.unity
+    missingGoDescriptions:
+    - path: 0/1-1
+      componentDescriptions:
+      - status: 0
+        missingFieldPaths: []
+        componentName: UnityEngine.Transform
+      - status: 2
+        missingFieldPaths:
+        - material
+        - materialTable.material
+        componentName: CheckMissingTool.Demo.BlackBoard
+  projectCheckMissingResult:
+    searchPaths:
+    - Assets/Script
+    missingGoDescriptions: []
